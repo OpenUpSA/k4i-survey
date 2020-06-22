@@ -29,14 +29,15 @@
     <script>
         document.getElementById('submit_btn').addEventListener('click', async function () {
             var url = 'https://script.google.com/macros/s/AKfycbzI0ETzEo77c6anMoUEyFDfoSdi5Eg8tWNqieClSPjI50SyhkM/exec';
+            const k4iCharts = new K4ICharts(url);
+            await k4iCharts.loadData()
+
             var chartName = document.getElementById('chartName').value;
             var el1 = document.getElementById('myChart1');
             var el2 = document.getElementById('myChart2');
 
-            const data = await loadData(url, chartName)
-            loadData(url, chartName);
-            createChart(el1, data.labels, data.counts, chartName, 'bar');
-            createChart(el2, data.labels, data.counts, chartName, 'pie');
+            k4iCharts.createChart(el1, chartName, 'bar');
+            k4iCharts.createChart(el2, chartName, 'pie');
         })
     </script>
 </body>
