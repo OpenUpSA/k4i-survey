@@ -8,8 +8,17 @@ function counts(arr) {
 }
 
 class K4ICharts {
-    constructor(sheet_url) {
+    constructor(sheet_url, options) {
         this.url = sheet_url;
+
+        options = options || {};
+        this.options = options;
+        this.options.backgroundColor = options.backgroundColor || ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#ff6345','#36a2gh'];
+        this.options.personalColor = options.personalColor || '#800080';
+        this.options.greyColor = options.greyColor || '#ababab';
+        this.options.legendDisplay = options.legendDisplay || false;
+        this.options.title = options.title || "";
+        this.options.titleDisplay = options.titleDisplay || true;
     }
 
     async loadData() {
@@ -19,6 +28,12 @@ class K4ICharts {
         } else {
             throw Error(response.statusText);
         }
+
+        this.individualResult = this.data.slice(-1)[0]
+    }
+
+    get numResponses() {
+        return this.data.length;
     }
 
     extractData(col) {
@@ -32,25 +47,48 @@ class K4ICharts {
         return count;
     }
 
-    createChart(containerId, chartName, chartType) {
+    createPersonalChart(containerId, colName, chartType, options) {
+        var options = options || {}
+        const count = this.extractData(colName);
+        const backgroundColor = Object.keys(count).map(k => {
+            const personalValue = this.individualResult[colName];
+            if (k == personalValue) {
+                return this.options.personalColor;
+            }
+
+            return this.options.greyColor;
+        })
+
+        options.backgroundColor = backgroundColor;
+        options = {...this.options, ...options}
+
+        return this.createChart(containerId, colName, chartType, options)
+    }
+
+    createChart(containerId, colName, chartType, options) {
+        var options = options || this.options;
+
         const el = document.getElementById(containerId);
         const ctx = el.getContext('2d');
-        const count = this.extractData(chartName);
+        const count = this.extractData(colName);
 
         const chart = new Chart(ctx, {
             type: chartType,
             data: {
                 labels: Object.keys(count),
                 datasets: [{
-                    label: chartName,
-                    backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#ff6345','#36a2gh'],
+                    backgroundColor: options.backgroundColor,
                     borderColor: 'white',
                     data: Object.values(count)
                 }]
             },
 
             // Configuration options go here
-            options: {}
+            options: {
+                legend: {
+                    display: options.legendDisplay
+                }
+            }
         });
     }
 }

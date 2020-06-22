@@ -34,8 +34,9 @@
 
             var chartName = document.getElementById('chartName').value;
 
-            k4iCharts.createChart('myChart1', chartName, 'bar');
+            k4iCharts.createPersonalChart('myChart1', chartName, 'bar');
             k4iCharts.createChart('myChart2', chartName, 'pie');
+            console.log(`Number of responses: ${k4iCharts.numResponses}`);
         })
     </script>
 </body>
