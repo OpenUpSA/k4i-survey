@@ -33,11 +33,9 @@
             await k4iCharts.loadData()
 
             var chartName = document.getElementById('chartName').value;
-            var el1 = document.getElementById('myChart1');
-            var el2 = document.getElementById('myChart2');
 
-            k4iCharts.createChart(el1, chartName, 'bar');
-            k4iCharts.createChart(el2, chartName, 'pie');
+            k4iCharts.createChart('myChart1', chartName, 'bar');
+            k4iCharts.createChart('myChart2', chartName, 'pie');
         })
     </script>
 </body>

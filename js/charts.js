@@ -32,7 +32,8 @@ class K4ICharts {
         return count;
     }
 
-    createChart(el, chartName, chartType) {
+    createChart(containerId, chartName, chartType) {
+        const el = document.getElementById(containerId);
         const ctx = el.getContext('2d');
         const count = this.extractData(chartName);
 
