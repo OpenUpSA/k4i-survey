@@ -7,6 +7,7 @@ function counts(arr) {
     return count
 }
 
+var myvar;
 class K4ICharts {
     constructor(sheet_url, options) {
         this.url = sheet_url;
@@ -45,6 +46,100 @@ class K4ICharts {
         const count = counts(arr)
 
         return count;
+    }
+    
+    calculateAverageWithMapping(col, mapping) {
+        const counts = this.extractData(col);
+        let numObs = 0;
+        let total = 0;
+        for (const [k, v] of Object.entries(counts)) {
+            numObs += v;
+            let asNum = mapping[k] || 0;
+            total += asNum * v;
+        }
+
+        if (numObs > 0)
+            return total / numObs 
+
+        return 0;
+    }
+
+    createMultiBarChart(containerId, colNames, mapping, options) {
+        const el = document.getElementById(containerId);
+        const ctx = el.getContext('2d');
+        const self = this;
+        const customOptions = {...this.options, ...(options || {})};
+        const individualBarConfig = {
+            ...{width: 3, color: this.options.personalColor},
+            ...customOptions.individualBar
+        }
+        const individualBar = customOptions.individualBar || 3;
+
+        let values = colNames.map(colName => {
+            return this.calculateAverageWithMapping(colName, mapping);
+        })
+
+        const domain = {
+            min: Math.min(...Object.values(mapping)),
+            max: Math.max(...Object.values(mapping))
+        }
+
+        const barWidth = customOptions.individualValue
+
+            
+        const scale = (rangeMin, rangeMax, domainMin, domainMax) => {
+            return function(value) {
+                const perc = value / (domainMax - domainMin)
+                const rangeValue = (rangeMax - rangeMin) * perc + rangeMin;
+                return rangeValue;
+            }
+        }
+
+        customOptions["scales"] = {
+            xAxes: [{
+                ticks: domain
+            }]
+        }
+
+        var originalDraw = Chart.controllers.horizontalBar.prototype.draw;
+        Chart.controllers.horizontalBar.prototype.draw = function (ease) {
+            const xAxis = this.chart.controller.boxes[1];
+            const yAxis = this.chart.controller.boxes[2];
+            const ctx = this.chart.chart.ctx;
+            const barTop = bar => bar._view.y - bar._view.height / 2;
+            const barBottom = bar => bar._view.y + bar._view.height / 2;
+            const barLabel = bar => bar._view.label;
+            
+            const xScale= scale(xAxis.left, xAxis.right, domain.min, domain.max);
+            
+            originalDraw.call(this, ease);
+
+            myvar = this.chart.getDatasetMeta(0);
+
+            this.chart.getDatasetMeta(0).data.forEach(bar => {
+                const individualValue = mapping[self.individualResult[barLabel(bar)]];
+                const xValue = xScale(individualValue);
+                ctx.beginPath();
+                ctx.strokeStyle = individualBarConfig.color;
+                ctx.lineWidth = individualBarConfig.width;
+                ctx.moveTo(xValue, barTop(bar));
+                ctx.lineTo(xValue, barBottom(bar));
+                ctx.stroke();
+            })
+        };
+        
+        const chart = new Chart(ctx, {
+            type: 'horizontalBar',
+            data: {
+                labels: colNames,
+                datasets: [{
+                    backgroundColor: customOptions.greyColor,
+                    borderColor: 'white',
+                    data: values
+                }],
+            },
+            options: customOptions
+        });
     }
 
     createPersonalChart(containerId, colName, chartType, options) {
