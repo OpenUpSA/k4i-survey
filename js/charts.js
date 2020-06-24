@@ -12,14 +12,17 @@ class K4ICharts {
     constructor(sheet_url, options) {
         this.url = sheet_url;
 
-        options = options || {};
+        options = {...(options || {})};
         this.options = options;
         this.options.backgroundColor = options.backgroundColor || ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#ff6345','#36a2gh'];
         this.options.personalColor = options.personalColor || '#800080';
+        this.options.decimalPlaces = options.decimalPlaces || 3;
         this.options.greyColor = options.greyColor || '#ababab';
         this.options.legendDisplay = options.legendDisplay || false;
         this.options.title = options.title || "";
         this.options.titleDisplay = options.titleDisplay || true;
+        this.options.maxLabelLength = options.maxLabelLength || 20;
+        this.options.scales = {...(options.scales || {})}
     }
 
     async loadData() {
@@ -59,7 +62,7 @@ class K4ICharts {
         }
 
         if (numObs > 0)
-            return total / numObs 
+            return (total / numObs).toFixed(this.options.decimalPlaces);
 
         return 0;
     }
@@ -95,11 +98,27 @@ class K4ICharts {
             }
         }
 
-        customOptions["scales"] = {
+        customOptions.scales = {...this.options, ...{
             xAxes: [{
-                ticks: domain
+                ticks: {
+                    min: domain.min,
+                    max: domain.max,
+                }
+            }],
+            yAxes: [{
+                ticks: {
+                    callback: value => {
+                        console.log(value);
+                        const l = value.length;
+                        const maxLength = this.options.maxLabelLength;
+                        if (l > maxLength)
+                            return value.substr(0, maxLength) + '...'
+                        else
+                            return value
+                    }
+                }
             }]
-        }
+        }}
 
         var originalDraw = Chart.controllers.horizontalBar.prototype.draw;
         Chart.controllers.horizontalBar.prototype.draw = function (ease) {
@@ -110,7 +129,7 @@ class K4ICharts {
             const barBottom = bar => bar._view.y + bar._view.height / 2;
             const barLabel = bar => bar._view.label;
             
-            const xScale= scale(xAxis.left, xAxis.right, domain.min, domain.max);
+            const xScale = scale(xAxis.left, xAxis.right, domain.min, domain.max);
             
             originalDraw.call(this, ease);
 

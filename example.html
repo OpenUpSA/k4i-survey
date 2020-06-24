@@ -31,14 +31,14 @@
     <script src="js/charts.js"></script>
     <script>
         var customOptions = {
-            scales: {
-                yAxes: [{display: true, labelString: 'Number of responses'}]
-            }
+            personalColor: '#651123',
+            decimalPlaces: 2,
         }
+
         document.getElementById('submit_btn').addEventListener('click', async function () {
             var url = 'https://script.google.com/macros/s/AKfycbzI0ETzEo77c6anMoUEyFDfoSdi5Eg8tWNqieClSPjI50SyhkM/exec';
-            //url = '/data.json';
-            const k4iCharts = new K4ICharts(url);
+            url = '/data.json';
+            const k4iCharts = new K4ICharts(url, customOptions);
             await k4iCharts.loadData()
 
             var chartName = document.getElementById('chartName').value;
@@ -62,7 +62,7 @@
                 'Always': 4
             }
 
-            k4iCharts.createMultiBarChart('myChart3', multiColumns, valueMap, {legend: {display: false}});
+            k4iCharts.createMultiBarChart('myChart3', multiColumns, valueMap, {personalColor: '#443221', legend: {display: false}});
             console.log(`Number of responses: ${k4iCharts.numResponses}`);
         })
     </script>
