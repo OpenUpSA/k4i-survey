@@ -23,9 +23,13 @@
     <div class="container">
         <canvas id="myChart2"></canvas>
     </div>
-    <div class="container">
-        <canvas id="myChart3"></canvas>
-    </div>
+    <div class="container"><canvas id="myChart3"></canvas></div>
+    <div class="container"><canvas id="myChart4"></canvas></div>
+    <div class="container"><canvas id="myChart5"></canvas></div>
+    <div class="container"><canvas id="myChart6"></canvas></div>
+    <div class="container"><canvas id="myChart7"></canvas></div>
+    <div class="container"><canvas id="myChart8"></canvas></div>
+    <div class="container"><canvas id="myChart9"></canvas></div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
     <script src="js/charts.js"></script>
@@ -33,11 +37,25 @@
         var customOptions = {
             personalColor: '#651123',
             decimalPlaces: 2,
+            legend: {display: false}
+        }
+
+        const agreeDisagreeValueMap = {
+            'Strongly Disagree': 0,
+            'Disagree': 0,
+            'Neutral': 0,
+            'Agree': 1,
+            'Strongly Agree': 1,
+        }
+
+        const yesNoValueMap = {
+            'No': 0,
+            'Yes': 1,
         }
 
         document.getElementById('submit_btn').addEventListener('click', async function () {
-            var url = 'https://script.google.com/macros/s/AKfycbzI0ETzEo77c6anMoUEyFDfoSdi5Eg8tWNqieClSPjI50SyhkM/exec';
-            url = './data.json';
+            var url = 'https://script.google.com/macros/s/AKfycbyVQW35ZOqimGOUk7zKyAVLrh20nByGW6XirFmpNA25uTCuDHrA/exec';
+            //url = './data.json';
             const k4iCharts = new K4ICharts(url, customOptions);
             await k4iCharts.loadData()
 
@@ -46,15 +64,22 @@
             k4iCharts.createPersonalChart('myChart1', chartName, 'bar', customOptions);
             k4iCharts.createChart('myChart2', chartName, 'pie', customOptions);
 
-            const multiColumns = [
-                'Accounting/ financial management',
-                'Make Bookings (Travel bookings, scheduling meetings, venue booking etc.)',
+            // Title: How often do you use digital technologies to perform the following ACTIVITIES:
+            let multiColumns = [
+                'Accounting/financial management',
+                'Making Bookings',
                 'Emailing',
                 'Making audio or video calls',
-                'Marketing'
+                'Marketing',
+                'Printing and scanning',
+                'Designing',
+                'Monitoring (e.g. employees, production, security)',
+                'Research and development',
+                'Training',
+                'Filing'
             ]
 
-            const valueMap = {
+            let valueMap = {
                 'Never': 0,
                 'Rarely': 1,
                 'Half the time': 2,
@@ -62,9 +87,95 @@
                 'Always': 4
             }
 
-            k4iCharts.createMultiBarChart('myChart3', multiColumns, valueMap, {personalColor: '#443221', legend: {display: false}});
+            k4iCharts.createMultiBarChart('myChart3', multiColumns, valueMap);
+
+            // Title: Where did you get digitial skills training in your organisation?
+            multiColumns = [
+                'Accredited training',
+                'In-house training',
+                'No support system to enhance digital skills',
+                'Self-development of staff',
+                'Online training',
+                'External training',
+            ]
+
+            k4iCharts.createMultiBarChart('myChart4', multiColumns, agreeDisagreeValueMap);
+
+            // Title: Perceived risk associated with digital technology usage in the workplace.
+            multiColumns = [
+                'Potential financial loss',
+                'Data loss',
+                'Online scamming',
+                'Less trustworthy than pen and paper',
+                'Takes too long to learn',
+                'Risk to privacy of my personal data',
+            ]
+
+            k4iCharts.createMultiBarChart('myChart5', multiColumns, agreeDisagreeValueMap);
+            
+
+            // Title: What is your attitude toward using digital technologies? 
+            multiColumns = [
+                'Waste of time',
+                'Not interested',
+                'No additional value added',
+                'Too complicated',
+                'No real need',
+                'Limit my capacity as a human',
+            ]
+            k4iCharts.createMultiBarChart('myChart6', multiColumns, agreeDisagreeValueMap);
+
+            // Title: Among the following digital technologies which ones do you currently use to perform your daily duties
+            multiColumns = [
+                'State-of-the-art printers and scanners',
+                'Business WhatsApp',
+                'Hi-tech telephone',
+                'Faster computers and tablets',
+                'Digital filing',
+                'Mobile Applications',
+                'Blockchain technology',
+                'Reliable internet',
+                'Smartboards',
+                'Software and web applications',
+                'Automated equipment',
+                'Voice over Internet protocol (VOIP)',
+                'Video conferencing applications',
+                'Artificial intelligence',
+            ]
+            k4iCharts.createMultiBarChart('myChart7', multiColumns, yesNoValueMap);
+
+            // Title: How did you learn to use the digital technologies currently used in your organisation?
+            multiColumns = [
+                'High school',
+                'In-house training/Workshops',
+                'Peer-learning (learning from friends, colleagues, family member etc.)',
+                'Self-taught',
+                'Short-courses',
+                'Tertiary education',
+                'Previous work experience',
+                'External training/workshops (training conducted and organised outside the organisation)',
+                'I have NO digital skills'
+            ]
+
+            k4iCharts.createMultiBarChart('myChart8', multiColumns, yesNoValueMap);
+
+            // Title: In your opinion what are the other digital technologies you will require to perform your job in the future?
+            multiColumns = [
+                'Faster Wi-Fi/Internet connection',
+                'Ultra-modern equipment (Upgrade current digital equipment/s)',
+                'Artificial Intelligence (AI)',
+                'Internet of Things (IoT)',
+                'Robots',
+                'Scanners',
+                'Tracking systems',
+                'Voice over internet protocol (VOIP)'
+            ]
+
+            k4iCharts.createMultiBarChart('myChart9', multiColumns, yesNoValueMap);
+
             console.log(`Number of responses: ${k4iCharts.numResponses}`);
         })
+
     </script>
 </body>
 
