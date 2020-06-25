@@ -14,7 +14,7 @@ class K4ICharts {
 
         options = {...(options || {})};
         this.options = options;
-        this.options.backgroundColor = options.backgroundColor || ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#ff6345','#36a2gh'];
+        this.options.backgroundColor = options.backgroundColor || ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#ff6345','#36a2gh', '#a6cee3', '#b2df8a', '#fb9a99', '#ff7f00', '#6a3d9a', '#b15928'  ];
         this.options.personalColor = options.personalColor || '#800080';
         this.options.decimalPlaces = options.decimalPlaces || 3;
         this.options.greyColor = options.greyColor || '#ababab';
@@ -22,6 +22,7 @@ class K4ICharts {
         this.options.title = options.title || "";
         this.options.titleDisplay = options.titleDisplay || true;
         this.options.maxLabelLength = options.maxLabelLength || 20;
+        this.options.showMultiPersonal = options.showMultiPersonal || false;
         this.options.scales = {...(options.scales || {})}
     }
 
@@ -120,39 +121,41 @@ class K4ICharts {
             }]
         }}
 
-        var originalDraw = Chart.controllers.horizontalBar.prototype.draw;
-        Chart.controllers.horizontalBar.prototype.draw = function (ease) {
-            const xAxis = this.chart.controller.boxes[1];
-            const yAxis = this.chart.controller.boxes[2];
-            const ctx = this.chart.chart.ctx;
-            const barTop = bar => bar._view.y - bar._view.height / 2;
-            const barBottom = bar => bar._view.y + bar._view.height / 2;
-            const barLabel = bar => bar._view.label;
-            
-            const xScale = scale(xAxis.left, xAxis.right, domain.min, domain.max);
-            
-            originalDraw.call(this, ease);
+        if (this.options.showMultiPersonal) {
+            var originalDraw = Chart.controllers.horizontalBar.prototype.draw;
+            Chart.controllers.horizontalBar.prototype.draw = function (ease) {
+                const xAxis = this.chart.controller.boxes[1];
+                const yAxis = this.chart.controller.boxes[2];
+                const ctx = this.chart.chart.ctx;
+                const barTop = bar => bar._view.y - bar._view.height / 2;
+                const barBottom = bar => bar._view.y + bar._view.height / 2;
+                const barLabel = bar => bar._view.label;
+                
+                const xScale = scale(xAxis.left, xAxis.right, domain.min, domain.max);
+                
+                originalDraw.call(this, ease);
 
-            myvar = this.chart.getDatasetMeta(0);
+                myvar = this.chart.getDatasetMeta(0);
 
-            this.chart.getDatasetMeta(0).data.forEach(bar => {
-                const individualValue = mapping[self.individualResult[barLabel(bar)]];
-                const xValue = xScale(individualValue);
-                ctx.beginPath();
-                ctx.strokeStyle = individualBarConfig.color;
-                ctx.lineWidth = individualBarConfig.width;
-                ctx.moveTo(xValue, barTop(bar));
-                ctx.lineTo(xValue, barBottom(bar));
-                ctx.stroke();
-            })
-        };
+                this.chart.getDatasetMeta(0).data.forEach(bar => {
+                    const individualValue = mapping[self.individualResult[barLabel(bar)]];
+                    const xValue = xScale(individualValue);
+                    ctx.beginPath();
+                    ctx.strokeStyle = individualBarConfig.color;
+                    ctx.lineWidth = individualBarConfig.width;
+                    ctx.moveTo(xValue, barTop(bar));
+                    ctx.lineTo(xValue, barBottom(bar));
+                    ctx.stroke();
+                })
+            };
+        }
         
         const chart = new Chart(ctx, {
             type: 'horizontalBar',
             data: {
                 labels: colNames,
                 datasets: [{
-                    backgroundColor: customOptions.greyColor,
+                    backgroundColor: customOptions.backgroundColor,
                     borderColor: 'white',
                     data: values
                 }],
